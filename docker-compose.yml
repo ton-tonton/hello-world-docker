@@ -1,41 +1,13 @@
-version: "3"
+version: '3'
 services:
+  db:
+    image: postgres
   web:
-    image: youknowok/get-started:part2
-    deploy:
-      replicas: 3
-      restart_policy:
-        condition: on-failure
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 50M
-    ports:
-      - "80:80"
-    networks:
-      - webnet
-  visualizer:
-    image: dockersamples/visualizer:stable
-    ports:
-      - "8080:8080"
+    build: .
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-    networks:
-      - webnet
-  redis:
-    image: redis
+      - .:/myapp
     ports:
-      - "6379:6379"
-    volumes:
-      - /home/docker/data:/data
-    deploy:
-      placement:
-        constraints: [node.role == manager]
-    command: redis-server --appendonly yes
-    networks:
-      - webnet
-networks:
-  webnet:
+      - "3000:3000"
+    depends_on:
+      - db
