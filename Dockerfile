@@ -1,20 +1,14 @@
-# Use an official Python runtime as a parent image
-FROM python:2.7-slim
+FROM ruby:2.3
 
-# Set the working directory to /app
-WORKDIR /app
+ENV APP_HOME /myapp
+RUN mkdir $APP_HOME
+WORKDIR $APP_HOME
 
-# Copy the current directory contents into the container at /app
-ADD . /app
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs
 
-# Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+ADD Gemfile $APP_HOME/Gemfile
+ADD Gemfile.lock $APP_HOME/Gemfile.lock
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+RUN bundle install
 
-# Define environment variable
-ENV NAME World
-
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+ADD . $APP_HOME
